@@ -32,7 +32,7 @@ import SelectInput from "@/components/inputs/selectInput";
 import { getCurrentLocation } from "@/utils";
 
 // Constants
-import { LANGUAGES, PAYMENT_TERMS } from "@/constants";
+import { YES_NO, LANGUAGES, PAYMENT_TERMS } from "@/constants";
 
 const schema = z.object({
   farmerName: z.string().min(1, "Farmer name is required"),
@@ -335,8 +335,9 @@ const Create = ({ fields, refetch, handleModalClose }) => {
                 error={!!errors.isTenderCoconutFarm}
                 message={errors.isTenderCoconutFarm?.message}
               >
-                <MenuItem value={true}>Yes</MenuItem>
-                <MenuItem value={false}>No</MenuItem>
+                {YES_NO.map((l) => (
+                  <MenuItem value={l.value}>{l.label}</MenuItem>
+                ))}
               </SelectInput>
             )}
           />
@@ -353,8 +354,9 @@ const Create = ({ fields, refetch, handleModalClose }) => {
                 error={!!errors.isDryCoconutFarm}
                 message={errors.isDryCoconutFarm?.message}
               >
-                <MenuItem value={true}>Yes</MenuItem>
-                <MenuItem value={false}>No</MenuItem>
+                {YES_NO.map((l) => (
+                  <MenuItem value={l.value}>{l.label}</MenuItem>
+                ))}
               </SelectInput>
             )}
           />
@@ -592,7 +594,10 @@ const Create = ({ fields, refetch, handleModalClose }) => {
                 label="Crops Available*"
                 variant="outlined"
                 error={!!errors.cropsAvailable}
-                helperText={errors.cropsAvailable?.message}
+                helperText={
+                  errors.cropsAvailable?.message ||
+                  "Separate multiple values with commas (, )"
+                }
               />
             )}
           />

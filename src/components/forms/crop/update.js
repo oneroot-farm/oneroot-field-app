@@ -213,8 +213,6 @@ const Update = ({ fields, refetch, handleModalClose }) => {
         cropsAvailable: cropsAvailable.split(",").map((crop) => crop.trim()),
       };
 
-      console.log("Data : ", payload);
-
       const reference = doc(db, "crops", fields.id);
 
       await updateDoc(reference, payload);

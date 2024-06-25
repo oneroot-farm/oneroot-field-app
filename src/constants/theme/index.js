@@ -33,19 +33,9 @@ export const getColors = (theme) => {
         alert: "#D32F2F",
         transparent: "transparent",
 
-        "projection-requested": "#84BCD4",
-        "projection-accepted": "#76A63A",
-        "projection-declined": "#FFA687",
-
-        "indent-unassigned": "#E8E8E2",
-        "indent-requested": "#84BCD4",
-        "indent-loading": "#F4EC7C",
-        "indent-in-transit": "#E8AA14",
-        "indent-payment-pending": "#FFA687",
-        "indent-completed": "#76A63A",
-
-        "purchase-proceed-payment": "#FFA687",
-        "purchase-paid": "#76A63A",
+        "qc-pending": "#84BCD4",
+        "qc-completed": "#76A63A",
+        "qc-cancelled": "#FFA687",
       },
       secondary: {
         main: "#76A63A",
@@ -65,19 +55,9 @@ export const getColors = (theme) => {
         alert: "#D32F2F",
         transparent: "transparent",
 
-        "projection-requested": "#84BCD4",
-        "projection-accepted": "#76A63A",
-        "projection-declined": "#FFA687",
-
-        "indent-unassigned": "#E8E8E2",
-        "indent-requested": "#84BCD4",
-        "indent-loading": "#F4EC7C",
-        "indent-in-transit": "#E8AA14",
-        "indent-payment-pending": "#FFA687",
-        "indent-completed": "#76A63A",
-
-        "purchase-proceed-payment": "#FFA687",
-        "purchase-paid": "#76A63A",
+        "qc-pending": "#84BCD4",
+        "qc-completed": "#76A63A",
+        "qc-cancelled": "#FFA687",
       },
     };
   }
@@ -102,19 +82,9 @@ export const getColors = (theme) => {
         alert: "#D32F2F",
         transparent: "transparent",
 
-        "projection-requested": "#84BCD4",
-        "projection-accepted": "#76A63A",
-        "projection-declined": "#FFA687",
-
-        "indent-unassigned": "#E8E8E2",
-        "indent-requested": "#84BCD4",
-        "indent-loading": "#F4EC7C",
-        "indent-in-transit": "#E8AA14",
-        "indent-payment-pending": "#FFA687",
-        "indent-completed": "#76A63A",
-
-        "purchase-proceed-payment": "#FFA687",
-        "purchase-paid": "#76A63A",
+        "qc-pending": "#84BCD4",
+        "qc-completed": "#76A63A",
+        "qc-cancelled": "#FFA687",
       },
       secondary: {
         main: "#76A63A",
@@ -134,19 +104,9 @@ export const getColors = (theme) => {
         alert: "#D32F2F",
         transparent: "transparent",
 
-        "projection-requested": "#84BCD4",
-        "projection-accepted": "#76A63A",
-        "projection-declined": "#FFA687",
-
-        "indent-cc-unassigned": "#E8E8E2",
-        "indent-requested": "#84BCD4",
-        "indent-loading": "#F4EC7C",
-        "indent-in-transit": "#E8AA14",
-        "indent-payment-pending": "#FFA687",
-        "indent-completed": "#76A63A",
-
-        "purchase-proceed-payment": "#FFA687",
-        "purchase-paid": "#76A63A",
+        "qc-pending": "#84BCD4",
+        "qc-completed": "#76A63A",
+        "qc-cancelled": "#FFA687",
       },
     };
   }

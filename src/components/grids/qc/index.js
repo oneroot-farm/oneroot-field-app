@@ -12,17 +12,20 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 
-import { Box, IconButton, CircularProgress } from "@mui/material";
+import { Box, Chip, IconButton, CircularProgress } from "@mui/material";
 
 // Components
 import Modal from "@/components/modal";
 import NoRows from "@/components/noRows";
 
 // Forms
-import UpdateCropForm from "@/components/forms/crop/update";
+import CreateQCForm from "@/components/forms/qc/create";
+
+// Utils
+import { convertFromTimestampToDate } from "@/utils";
 
 // Icons
-import EditIcon from "@mui/icons-material/Edit";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const CustomToolbar = () => (
   <GridToolbarContainer>
@@ -47,12 +50,34 @@ const CustomToolbar = () => (
   </GridToolbarContainer>
 );
 
-const Crop = ({ data, isLoading = false, onSubmit }) => {
+const QCStatusChip = ({ status }) => {
+  return (
+    <Box width="100%" display="flex" alignItems="center">
+      <Chip
+        label={status.toUpperCase()}
+        sx={(theme) => ({
+          p: 1,
+          borderRadius: 2,
+          fontWeight: "500",
+          letterSpacing: 0.3,
+          backgroundColor:
+            theme.palette.primary[
+              `qc-${status.toLowerCase().replace(/\s+/g, "-")}`
+            ],
+          color: theme.palette.primary.grey4,
+          opacity: 0.75,
+        })}
+      />
+    </Box>
+  );
+};
+
+const QC = ({ data, isLoading = false, refetch }) => {
   const { classes } = useStyles();
 
-  const [crop, setCrop] = useState(null);
+  const [qcRequest, setQcRequest] = useState(null);
   const [modal, setModal] = useState({
-    update: false,
+    create: false,
   });
 
   // function to open a modal
@@ -62,10 +87,10 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
   const closeModal = (state) =>
     setModal((prev) => ({ ...prev, [state]: false }));
 
-  const handleUpdateCrop = (row) => {
-    setCrop(row);
+  const handleCreateQC = (row) => {
+    setQcRequest(row);
 
-    openModal("update");
+    openModal("create");
   };
 
   const columns = useMemo(() => {
@@ -75,98 +100,112 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
         headerName: "Farm ID",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.farmName || "N/A",
       },
       {
         field: "farmerName",
         headerName: "Farmer Name",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.farmerName || "N/A",
       },
       {
         field: "language",
-        headerName: "Language",
+        headerName: "Farmer Language",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.language || "N/A",
       },
       {
-        field: "mobileNumber",
-        headerName: "Mobile Number",
+        field: "farmerMobileNumber",
+        headerName: "Farmer Mobile Number",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.mobileNumber || "N/A",
       },
       {
         field: "variety",
         headerName: "Variety",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.variety || "N/A",
       },
       {
         field: "numberOfTrees",
         headerName: "Number Of Trees",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.numberOfTrees || "N/A",
       },
       {
         field: "ageOfTree",
         headerName: "Age Of Tree",
         flex: 1,
         minWidth: 120,
-        valueFormatter: ({ value }) => `${value} years`,
+        valueGetter: ({ row }) => `${row.crop?.ageOfTree} years` || "N/A",
       },
       {
         field: "heightOfTree",
         headerName: "Height Of Tree",
         flex: 1,
         minWidth: 120,
-        valueFormatter: ({ value }) => `${value} ft.`,
+        valueGetter: ({ row }) => `${row.crop?.heightOfTree} ft.` || "N/A",
       },
       {
         field: "numberOfNuts",
         headerName: "Number Of Nuts",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.numberOfNuts || "N/A",
       },
       {
         field: "nutsFromLastHarvest",
         headerName: "Nuts From Last Harvest",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.nutsFromLastHarvest || "N/A",
       },
       {
         field: "readyToHarvestDate",
         headerName: "Next Harvest Date",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.readyToHarvestDate || "N/A",
       },
       {
         field: "actualReadyToHarvestDate",
         headerName: "Actual Next Harvest Date",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.actualReadyToHarvestDate || "N/A",
       },
       {
         field: "chutePercentage",
         headerName: "Chute Percentage",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.chutePercentage || "N/A",
       },
       {
         field: "firstLastHarvestDate",
         headerName: "First Last Harvest Date",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.firstLastHarvestDate || "N/A",
       },
       {
         field: "secondLastHarvestDate",
         headerName: "Second Last Harvest Date",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.secondLastHarvestDate || "N/A",
       },
       {
         field: "thirdLastHarvestDate",
         headerName: "Third Last Harvest Date",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.thirdLastHarvestDate || "N/A",
       },
       /*
       {
@@ -174,6 +213,7 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
         headerName: "Village",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.village || "N/A",
       },
       */
       {
@@ -181,12 +221,14 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
         headerName: "Crops Available",
         flex: 1,
         minWidth: 120,
-        renderCell: ({ value }) => {
-          if (Array.isArray(value)) {
-            return value.join(", ");
+        valueGetter: ({ row }) => {
+          const crops = row.crop?.cropsAvailable;
+
+          if (Array.isArray(crops)) {
+            return crops.join(", ");
           }
 
-          return value || "N/A";
+          return crops || "N/A";
         },
       },
       {
@@ -194,26 +236,59 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
         headerName: "Tender Coconut Farm",
         flex: 1,
         minWidth: 120,
-        renderCell: ({ value }) => (value ? "Yes" : "No"),
+        valueGetter: ({ row }) =>
+          (row.crop?.isTenderCoconutFarm ? "Yes" : "No") || "N/A",
       },
       {
         field: "isDryCoconutFarm",
         headerName: "Dry Coconut Farm",
         flex: 1,
         minWidth: 120,
-        renderCell: ({ value }) => (value ? "Yes" : "No"),
+        valueGetter: ({ row }) =>
+          (row.crop?.isDryCoconutFarm ? "Yes" : "No") || "N/A",
       },
       {
         field: "generalHarvestCycleInDays",
         headerName: "General Harvest Cycle In Days",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.generalHarvestCycleInDays || "N/A",
       },
       {
         field: "paymentTerms",
         headerName: "Payment Terms",
         flex: 1,
         minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.paymentTerms || "N/A",
+      },
+      {
+        field: "name",
+        headerName: "Buyer Name",
+        flex: 1,
+        minWidth: 120,
+        valueGetter: ({ row }) => row.user?.name || "N/A",
+      },
+      {
+        field: "buyerMobileNumber",
+        headerName: "Buyer Mobile Number",
+        flex: 1,
+        minWidth: 120,
+        valueGetter: ({ row }) => row.user?.mobileNumber || "N/A",
+      },
+      {
+        field: "createdAt",
+        headerName: "Request Date",
+        flex: 1,
+        minWidth: 120,
+        valueFormatter: ({ value }) =>
+          convertFromTimestampToDate(value.seconds, value.nanoseconds),
+      },
+      {
+        field: "status",
+        headerName: "QC Status",
+        flex: 1,
+        minWidth: 180,
+        renderCell: ({ row }) => <QCStatusChip status={row.status} />,
       },
       {
         field: "actions",
@@ -221,8 +296,11 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
         flex: 1,
         minWidth: 120,
         renderCell: ({ row }) => (
-          <IconButton onClick={() => handleUpdateCrop(row)}>
-            <EditIcon />
+          <IconButton
+            onClick={() => handleCreateQC(row)}
+            /* disabled={row.status === "completed" || "cancelled"} */
+          >
+            <AddCircleIcon />
           </IconButton>
         ),
       },
@@ -266,6 +344,13 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
                 chutePercentage: false,
                 paymentTerms: false,
                 /* village: false, */
+                variety: false,
+                numberOfNuts: false,
+                nutsFromLastHarvest: false,
+                numberOfTrees: false,
+                ageOfTree: false,
+                heightOfTree: false,
+                readyToHarvestDate: false,
               },
             },
 
@@ -276,15 +361,15 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
 
       {/* Update Crop Modal */}
       <Modal
-        open={modal.update}
-        header={"Update Farm Form"}
+        open={modal.create}
+        header={"Create Quality Check Form"}
         modalStyles={{ padding: "1rem" }}
-        handleClose={() => closeModal("update")}
+        handleClose={() => closeModal("create")}
       >
-        <UpdateCropForm
-          fields={crop}
-          refetch={onSubmit}
-          handleModalClose={() => closeModal("update")}
+        <CreateQCForm
+          refetch={refetch}
+          qcRequest={qcRequest}
+          handleModalClose={() => closeModal("create")}
         />
       </Modal>
     </>
@@ -292,7 +377,7 @@ const Crop = ({ data, isLoading = false, onSubmit }) => {
 };
 
 // 🎨 Styles
-const useStyles = makeStyles({ name: { Crop } })((theme) => ({
+const useStyles = makeStyles({ name: { QC } })((theme) => ({
   grid: {
     "& .MuiDataGrid-root": {
       padding: theme.spacing(2),
@@ -320,4 +405,4 @@ const useStyles = makeStyles({ name: { Crop } })((theme) => ({
   },
 }));
 
-export default Crop;
+export default QC;

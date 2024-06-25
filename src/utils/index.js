@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 
+import { Timestamp } from "firebase/firestore";
+
 export const getUserAgent = () => {
   const { appName, appVersion, platform } = navigator;
 
@@ -108,4 +110,57 @@ export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
+};
+
+export const convertFromTimestampToDate = (seconds, nanoseconds) => {
+  // Convert seconds to milliseconds (since JavaScript Date expects milliseconds)
+  const milliseconds = seconds * 1000;
+
+  // Create a new Date object
+  const date = new Date(milliseconds);
+
+  // Extract year, month, and day from the Date object
+  const year = date.getFullYear();
+
+  // JavaScript months are 0-indexed, so we add 1 to get the correct month
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // Return the formatted date as a string in YYYY-MM-DD format
+  return `${year}-${month}-${day}`;
+};
+
+export const getTimeframeDates = (timeframe) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const endOfToday = new Date(today);
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const endOfTomorrow = new Date(tomorrow);
+  endOfTomorrow.setHours(23, 59, 59, 999);
+
+  const thisWeekStart = new Date(today);
+  const thisWeekEnd = new Date(today);
+
+  thisWeekEnd.setDate(today.getDate() + 6);
+  thisWeekEnd.setHours(23, 59, 59, 999);
+
+  return {
+    today: {
+      startDate: Timestamp.fromDate(today),
+      endDate: Timestamp.fromDate(endOfToday),
+    },
+    tomorrow: {
+      startDate: Timestamp.fromDate(tomorrow),
+      endDate: Timestamp.fromDate(endOfTomorrow),
+    },
+    thisWeek: {
+      startDate: Timestamp.fromDate(thisWeekStart),
+      endDate: Timestamp.fromDate(thisWeekEnd),
+    },
+  }[timeframe];
 };
