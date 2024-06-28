@@ -46,16 +46,19 @@ import {
 const schema = z.object({
   qcInspector: z
     .string()
-    .min(1, "QC Inspector is required")
     .nullable()
-    .refine((val) => val !== null, "QC Inspector is required"),
+    .refine((val) => val !== "", "QC Inspector is required"),
+
   qcDate: z.string().min(1, "QC Date is required"),
+
   readyToHarvest: z.string().min(1, "Ready to Harvest date is required"),
+
   heightOfTree: z
     .number()
     .nonnegative("Please enter a valid height of tree")
     .refine((value) => value !== 0, "Height of tree cannot be zero")
     .refine((value) => !isNaN(value), "Height of tree must be a valid number"),
+
   estimatedNumberOfNuts: z
     .number()
     .nonnegative("Please enter a valid number of estimated number of nuts")
@@ -64,21 +67,23 @@ const schema = z.object({
       (value) => !isNaN(value),
       "Estimated number of nuts must be a valid number"
     ),
+
   numberOfTrees: z
     .number()
     .nonnegative("Please enter a valid number of trees")
     .refine((value) => value !== 0, "Number of trees cannot be zero")
     .refine((value) => !isNaN(value), "Number of trees must be a valid number"),
+
   quality: z
     .string()
-    .min(1, "Quality is required")
     .nullable()
-    .refine((val) => val !== null, "Quality is required"),
+    .refine((val) => val !== "", "Quality is required"),
+
   size: z
     .string()
-    .min(1, "Size is required")
     .nullable()
-    .refine((val) => val !== null, "Size is required"),
+    .refine((val) => val !== "", "Size is required"),
+
   hardShellNutsPercentage: z
     .number()
     .nonnegative("Please enter a valid hard shell nuts percentage")
@@ -86,19 +91,23 @@ const schema = z.object({
       (value) => !isNaN(value),
       "Hard shell nuts percentage must be a valid number"
     ),
+
   fieldCondition: z
     .string()
-    .min(1, "Field condition is required")
     .nullable()
-    .refine((val) => val !== null, "Field condition is required"),
+    .refine((val) => val !== "", "Field condition is required"),
+
   VehicleEnteringCondition: z
     .string()
-    .min(1, "Vehicle entering condition is required")
     .nullable()
-    .refine((val) => val !== null, "Vehicle entering condition is required"),
+    .refine((val) => val !== "", "Vehicle entering condition is required"),
+
   isTenderCoconutFarm: z.boolean(),
+
   isDryCoconutFarm: z.boolean(),
+
   miteAttacksOrMarks: z.boolean(),
+
   waterPercentage: z
     .number()
     .nonnegative("Please enter a valid water percentage")
@@ -107,6 +116,7 @@ const schema = z.object({
       (value) => !isNaN(value),
       "Water percentage must be a valid number"
     ),
+
   malaiPercentage: z
     .number()
     .nonnegative("Please enter a valid malai percentage")
@@ -115,11 +125,12 @@ const schema = z.object({
       (value) => !isNaN(value),
       "Malai percentage must be a valid number"
     ),
+
   shape: z
     .string()
-    .min(1, "Shape is required")
     .nullable()
-    .refine((val) => val !== null, "Shape is required"),
+    .refine((val) => val !== "", "Shape is required"),
+
   generalHarvestCycleInDays: z
     .number()
     .nonnegative("Please enter a valid general harvest cycle in days")
@@ -131,6 +142,7 @@ const schema = z.object({
       (value) => !isNaN(value),
       "General harvest cycle in days must be a valid number"
     ),
+
   chutePercentage: z
     .number()
     .nonnegative("Please enter a valid chute percentage")
@@ -138,7 +150,9 @@ const schema = z.object({
       (value) => !isNaN(value),
       "Chute percentage must be a valid number"
     ),
+
   otherCropsAvailable: z.string().min(1, "Other crops available is required"),
+
   lastHarvestNumberOfNuts: z
     .number()
     .nonnegative("Please enter a valid last harvest number of nuts")
@@ -150,38 +164,39 @@ const schema = z.object({
       (value) => !isNaN(value),
       "Last harvest number of nuts must be a valid number"
     ),
+
   lastHarvestDate: z.string().min(1, "Last harvest date is required"),
+
   farmerUsesWhatsapp: z
     .string()
-    .min(1, "Farmer uses WhatsApp is required")
     .nullable()
-    .refine((val) => val !== null, "Farmer uses WhatsApp is required"),
+    .refine((val) => val !== "", "Farmer uses WhatsApp is required"),
 });
 
 const defaultValues = {
-  qcInspector: null,
+  qcInspector: "",
   qcDate: dayjs().format("YYYY-MM-DD"),
   readyToHarvest: dayjs().format("YYYY-MM-DD"),
   heightOfTree: 0,
   estimatedNumberOfNuts: 0,
   numberOfTrees: 0,
-  quality: null,
-  size: null,
+  quality: "",
+  size: "",
   hardShellNutsPercentage: 0,
-  fieldCondition: null,
-  VehicleEnteringCondition: null,
+  fieldCondition: "",
+  VehicleEnteringCondition: "",
   isTenderCoconutFarm: false,
   isDryCoconutFarm: false,
   miteAttacksOrMarks: false,
   waterPercentage: 0,
   malaiPercentage: 0,
-  shape: null,
+  shape: "",
   generalHarvestCycleInDays: 0,
   chutePercentage: 0,
   otherCropsAvailable: "",
   lastHarvestNumberOfNuts: 0,
   lastHarvestDate: dayjs().format("YYYY-MM-DD"),
-  farmerUsesWhatsapp: null,
+  farmerUsesWhatsapp: "",
 };
 
 const Create = ({ refetch, qcRequest, handleModalClose }) => {
