@@ -29,17 +29,21 @@ import TextInput from "@/components/inputs/textInput";
 import SelectInput from "@/components/inputs/selectInput";
 
 // Utils
-import { getCurrentLocation } from "@/utils";
+import { getCurrentLocation, areCoordinates } from "@/utils";
 
 // Constants
 import {
   SHAPES,
   YES_NO,
+  CROPS,
   SIZE_OPTIONS,
   QC_INSPECTORS,
   QUALITY_OPTIONS,
   FIELD_CONDITIONS,
+  IPM_ORGANIC_TYPES,
+  TURMERIC_VARIETIES,
   USES_WHATSAPP_OPTIONS,
+  TURMERIC_POLISHED_TYPES,
   VEHICLE_ENTERING_CONDITIONS,
 } from "@/constants";
 
@@ -151,7 +155,7 @@ const schema = z.object({
       "Chute percentage must be a valid number"
     ),
 
-  otherCropsAvailable: z.string().min(1, "Other crops available is required"),
+  otherCropsAvailable: z.array(z.string()),
 
   lastHarvestNumberOfNuts: z
     .number()
@@ -171,6 +175,21 @@ const schema = z.object({
     .string()
     .nullable()
     .refine((val) => val !== "", "Farmer uses WhatsApp is required"),
+
+  numberOfAcres: z.number().nonnegative("Please enter a valid number of acres"),
+  /* .refine((value) => value !== 0, "Number of acres can not be zero") */
+  /* .refine((value) => !isNaN(value), "Number of acres must be a valid number"), */
+
+  turmericVariety: z.string().nullable(),
+  /* .refine((value) => value !== "", "Variety is required"), */
+
+  polishedType: z.string().nullable(),
+  /* .refine((value) => value !== "", "Polished type is required"), */
+
+  ipmOrOrganic: z.string().nullable(),
+  /* .refine((value) => value !== "", "IPM Or Oraganic is required"), */
+
+  coords: z.string().optional(),
 });
 
 const defaultValues = {
@@ -193,16 +212,22 @@ const defaultValues = {
   shape: "",
   generalHarvestCycleInDays: 0,
   chutePercentage: 0,
-  otherCropsAvailable: "",
+  otherCropsAvailable: [],
+  numberOfAcres: 0,
+  turmericVariety: "",
+  polishedType: "",
+  ipmOrOrganic: "",
   lastHarvestNumberOfNuts: 0,
   lastHarvestDate: dayjs().format("YYYY-MM-DD"),
   farmerUsesWhatsapp: "",
+  coords: "",
 };
 
 const Create = ({ refetch, qcRequest, handleModalClose }) => {
   const {
-    reset,
+    watch,
     control,
+    setError,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -217,16 +242,90 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
     try {
       setLoading(true);
 
-      const position = await getCurrentLocation();
-
       const {
         qcRequestId,
         qcDate,
         readyToHarvest,
         lastHarvestDate,
         otherCropsAvailable,
+        numberOfAcres,
+        turmericVariety,
+        polishedType,
+        ipmOrOrganic,
+        coords,
         ...rest
       } = data;
+
+      if (otherCropsAvailable.includes("Turmeric")) {
+        let valid = true;
+
+        if (numberOfAcres === 0 || isNaN(numberOfAcres)) {
+          setError("numberOfAcres", {
+            type: "manual",
+            message:
+              "Number of acres can not be zero and must be a valid number",
+          });
+
+          valid = false;
+        }
+
+        if (!turmericVariety || turmericVariety === "") {
+          setError("turmericVariety", {
+            type: "manual",
+            message: "Variety is required",
+          });
+
+          valid = false;
+        }
+
+        if (!polishedType || polishedType === "") {
+          setError("polishedType", {
+            type: "manual",
+            message: "Polished type is required",
+          });
+
+          valid = false;
+        }
+
+        if (!ipmOrOrganic || ipmOrOrganic === "") {
+          setError("ipmOrOrganic", {
+            type: "manual",
+            message: "IPM Or Organic is required",
+          });
+
+          valid = false;
+        }
+
+        if (!valid) return;
+      }
+
+      if (coords) {
+        const point = /^\s*-?\d+\.\d+\s*,\s*-?\d+\.\d+\s*$/;
+
+        if (!point.test(coords) && !areCoordinates(coords)) {
+          setError("coords", {
+            type: "manual",
+            message: "Coordinates must be in 'latitude, longitude' format",
+          });
+
+          return;
+        }
+      }
+
+      let position = null;
+
+      if (coords && areCoordinates(coords)) {
+        const [lat, lng] = coords.split(",");
+
+        position = {
+          coords: {
+            latitude: parseFloat(lat),
+            longitude: parseFloat(lng),
+          },
+        };
+      } else {
+        position = await getCurrentLocation();
+      }
 
       const qcRequestRef = doc(db, "qc_requests", qcRequest.id);
 
@@ -239,9 +338,6 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         qcDate: dayjs(qcDate).format("YYYY-MM-DD"),
         readyToHarvest: dayjs(readyToHarvest).format("YYYY-MM-DD"),
         lastHarvestDate: dayjs(lastHarvestDate).format("YYYY-MM-DD"),
-        otherCropsAvailable: otherCropsAvailable
-          .split(",")
-          .map((crop) => crop.trim()),
         location: {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -250,6 +346,11 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         id: null,
         cropId: qcRequest.cropId,
         qcRequestId: qcRequest.id,
+        cropsAvailable: otherCropsAvailable,
+        numberOfAcres,
+        turmericVariety,
+        polishedType,
+        ipmOrOrganic,
       };
 
       const reference = await addDoc(collection(db, "qcs"), payload);
@@ -271,6 +372,8 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
       setLoading(false);
     }
   };
+
+  const crops = watch("otherCropsAvailable");
 
   return (
     <Container disableGutters className={cx(classes.container)}>
@@ -639,19 +742,19 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
 
         <Box className={cx(classes.inputWrapper)}>
           <Controller
-            name="otherCropsAvailable"
+            name="lastHarvestDate"
             control={control}
             render={({ field }) => (
-              <TextInput
-                {...field}
-                fullWidth
-                label="Other Crops Available*"
-                variant="outlined"
-                error={!!errors.otherCropsAvailable}
-                helperText={
-                  errors.otherCropsAvailable?.message ||
-                  "Separate multiple values with commas (, )"
-                }
+              <DatePicker
+                pickerProps={{
+                  format: "YYYY-MM-DD",
+                  label: "Last Harvest Date*",
+                  sx: { width: "100%" },
+                  value: dayjs(field.value),
+                  onChange: (date) =>
+                    field.onChange(dayjs(date).format("YYYY-MM-DD")),
+                  renderInput: (params) => <TextInput {...params} />,
+                }}
               />
             )}
           />
@@ -676,27 +779,134 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
 
         <Box className={cx(classes.inputWrapper)}>
           <Controller
-            name="lastHarvestDate"
+            name="otherCropsAvailable"
             control={control}
             render={({ field }) => (
-              <DatePicker
-                pickerProps={{
-                  format: "YYYY-MM-DD",
-                  label: "Last Harvest Date*",
-                  sx: { width: "100%" },
-                  value: dayjs(field.value),
-                  onChange: (date) =>
-                    field.onChange(dayjs(date).format("YYYY-MM-DD")),
-                  renderInput: (params) => <TextInput {...params} />,
-                }}
-              />
+              <SelectInput
+                {...field}
+                multiple
+                fullWidth
+                label="Crops Available"
+                variant="outlined"
+                error={!!errors.otherCropsAvailable}
+                message={errors.otherCropsAvailable?.message}
+              >
+                {CROPS.map((l) => (
+                  <MenuItem value={l.value}>{l.label}</MenuItem>
+                ))}
+              </SelectInput>
             )}
           />
         </Box>
 
+        {crops.includes("Turmeric") && (
+          <>
+            <FormHeader sx={{ mt: 4 }}>Turmeric Details</FormHeader>
+
+            <Box className={cx(classes.inputWrapper)}>
+              <Controller
+                name="turmericVariety"
+                control={control}
+                render={({ field }) => (
+                  <SelectInput
+                    {...field}
+                    fullWidth
+                    label="Variety*"
+                    variant="outlined"
+                    error={!!errors.turmericVariety}
+                    message={errors.turmericVariety?.message}
+                  >
+                    {TURMERIC_VARIETIES.map((l) => (
+                      <MenuItem value={l.value}>{l.label}</MenuItem>
+                    ))}
+                  </SelectInput>
+                )}
+              />
+
+              <Controller
+                name="numberOfAcres"
+                control={control}
+                render={({ field: { onChange, ...rest } }) => (
+                  <TextInput
+                    {...rest}
+                    fullWidth
+                    type="number"
+                    label="Number Of Acres*"
+                    variant="outlined"
+                    inputProps={{
+                      step: 0.1,
+                    }}
+                    error={!!errors.numberOfAcres}
+                    helperText={errors.numberOfAcres?.message}
+                    onChange={(e) => onChange(parseFloat(e.target.value))}
+                  />
+                )}
+              />
+            </Box>
+
+            <Box className={cx(classes.inputWrapper)}>
+              <Controller
+                name="polishedType"
+                control={control}
+                render={({ field }) => (
+                  <SelectInput
+                    {...field}
+                    fullWidth
+                    label="Polished Type*"
+                    variant="outlined"
+                    error={!!errors.polishedType}
+                    message={errors.polishedType?.message}
+                  >
+                    {TURMERIC_POLISHED_TYPES.map((l) => (
+                      <MenuItem value={l.value}>{l.label}</MenuItem>
+                    ))}
+                  </SelectInput>
+                )}
+              />
+
+              <Controller
+                name="ipmOrOrganic"
+                control={control}
+                render={({ field }) => (
+                  <SelectInput
+                    {...field}
+                    fullWidth
+                    label="IPM Or Oraganic*"
+                    variant="outlined"
+                    error={!!errors.ipmOrOrganic}
+                    message={errors.ipmOrOrganic?.message}
+                  >
+                    {IPM_ORGANIC_TYPES.map((l) => (
+                      <MenuItem value={l.value}>{l.label}</MenuItem>
+                    ))}
+                  </SelectInput>
+                )}
+              />
+            </Box>
+          </>
+        )}
+
         <FormHeader sx={{ mt: 4 }}>Additional Details</FormHeader>
 
         <Box className={cx(classes.inputWrapper)}>
+          <Controller
+            name="coords"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                fullWidth
+                label="Coordinates"
+                variant="outlined"
+                error={!!errors.coords}
+                helperText={
+                  errors.coords?.message ||
+                  "Captures current location if not provided"
+                }
+              />
+            )}
+          />
+
           <Controller
             name="farmerUsesWhatsapp"
             control={control}

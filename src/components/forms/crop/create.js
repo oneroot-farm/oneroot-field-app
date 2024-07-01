@@ -875,7 +875,7 @@ const Create = ({ fields, refetch, handleModalClose }) => {
             )}
           />
 
-          <Controller
+          {/* <Controller
             name="mapLink"
             control={control}
             render={({ field }) => (
@@ -888,7 +888,7 @@ const Create = ({ fields, refetch, handleModalClose }) => {
                 helperText={errors.mapLink?.message}
               />
             )}
-          />
+          /> */}
         </Box>
 
         <FormFooter>

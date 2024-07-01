@@ -30,7 +30,7 @@ const Home = () => {
           aria-label="basic tabs example"
         >
           <Tab label="Farms" id={`tab-${0}`} className={classes.tab} />
-          <Tab label="Quality Checks" id={`tab-${1}`} className={classes.tab} />
+          <Tab label="QC Requests" id={`tab-${1}`} className={classes.tab} />
         </Tabs>
       </Box>
 

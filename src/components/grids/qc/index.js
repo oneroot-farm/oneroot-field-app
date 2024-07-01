@@ -298,7 +298,7 @@ const QC = ({ data, isLoading = false, refetch }) => {
         renderCell: ({ row }) => (
           <IconButton
             onClick={() => handleCreateQC(row)}
-            /* disabled={row.status === "completed" || "cancelled"} */
+            disabled={row.status === "completed" || row.status === "cancelled"}
           >
             <AddCircleIcon />
           </IconButton>
