@@ -25,18 +25,15 @@ import Loader from "@/components/loader";
 import SelectInput from "@/components/inputs/selectInput";
 import QCGrid from "@/components/grids/qc";
 
-// Utils
-import { getTimeframeDates } from "@/utils";
-
 // Constants
-import { TIMEFRAMES } from "@/constants";
+import { QC_STATUSES } from "@/constants";
 
 const schema = z.object({
-  timeframe: z.string().nonempty("Timeframe is required"),
+  status: z.string().nonempty("Status is required"),
 });
 
 const defaultValues = {
-  timeframe: "today",
+  status: "pending",
 };
 
 const QC = () => {
@@ -54,7 +51,7 @@ const QC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const loadReference = useRef(true);
-  const timeframeReference = useRef(defaultValues.timeframe);
+  const statusReference = useRef(defaultValues.status);
 
   const refetch = async () => {
     await fetchQCs();
@@ -64,20 +61,14 @@ const QC = () => {
     try {
       setIsLoading(true);
 
-      const { timeframe } = getValues();
-
-      const { startDate, endDate } = getTimeframeDates(timeframe);
+      const { status } = getValues();
 
       const reference = collection(db, "qc_requests");
 
       let q = reference;
 
-      if (startDate && endDate) {
-        q = query(
-          reference,
-          where("createdAt", ">=", startDate),
-          where("createdAt", "<=", endDate)
-        );
+      if (status) {
+        q = query(reference, where("status", "==", status));
       }
 
       const querySnapshot = await getDocs(q);
@@ -138,19 +129,19 @@ const QC = () => {
     if (loadReference.current) {
       loadReference.current = false;
 
-      fetchQCs(getValues().timeframe);
+      fetchQCs(getValues().status);
     }
   }, []);
 
-  const timeframe = watch("timeframe");
+  const status = watch("status");
 
   useEffect(() => {
-    if (!loadReference.current && timeframeReference.current !== timeframe) {
-      timeframeReference.current = timeframe;
+    if (!loadReference.current && statusReference.current !== status) {
+      statusReference.current = status;
 
-      fetchQCs(timeframe);
+      fetchQCs(status);
     }
-  }, [timeframe]);
+  }, [status]);
 
   return (
     <Box
@@ -159,20 +150,20 @@ const QC = () => {
       flexDirection="column"
       justifyContent="center"
     >
-      {/* Timeframe */}
+      {/* Status */}
       <Controller
-        name="timeframe"
+        name="status"
         control={control}
         render={({ field }) => (
           <SelectInput
             {...field}
             fullWidth
-            label="Timeframe*"
+            label="Status*"
             variant="outlined"
-            error={!!errors.timeframe}
-            message={errors.timeframe?.message}
+            error={!!errors.status}
+            message={errors.status?.message}
           >
-            {TIMEFRAMES.map((s) => (
+            {QC_STATUSES.map((s) => (
               <MenuItem key={s.value} value={s.value}>
                 {s.label}
               </MenuItem>

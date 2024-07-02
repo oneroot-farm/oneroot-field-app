@@ -229,7 +229,12 @@ const Crop = ({ data, isLoading = false, refetch }) => {
             return (
               <>
                 {value.map((tag, index) => (
-                  <Chip key={index} label={tag} color="warning" />
+                  <Chip
+                    key={index}
+                    label={tag}
+                    variant="outlined"
+                    color="warning"
+                  />
                 ))}
               </>
             );

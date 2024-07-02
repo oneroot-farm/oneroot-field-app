@@ -230,3 +230,21 @@ export const CROPS = [
   { id: 10, label: "Nutmeg", value: "Nutmeg" },
   { id: 11, label: "Others", value: "Others" },
 ];
+
+export const QC_STATUSES = [
+  {
+    id: 1,
+    label: "Pending",
+    value: "pending",
+  },
+  {
+    id: 2,
+    label: "Completed",
+    value: "completed",
+  },
+  {
+    id: 3,
+    label: "Cancelled",
+    value: "cancelled",
+  },
+];
