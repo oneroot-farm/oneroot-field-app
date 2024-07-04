@@ -124,6 +124,13 @@ const QC = ({ data, isLoading = false, refetch }) => {
         valueGetter: ({ row }) => row.crop?.mobileNumber || "N/A",
       },
       {
+        field: "village",
+        headerName: "Village",
+        flex: 1,
+        minWidth: 120,
+        valueGetter: ({ row }) => row.crop?.village || "N/A",
+      },
+      {
         field: "variety",
         headerName: "Variety",
         flex: 1,
@@ -207,15 +214,6 @@ const QC = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
         valueGetter: ({ row }) => row.crop?.thirdLastHarvestDate || "N/A",
       },
-      /*
-      {
-        field: "village",
-        headerName: "Village",
-        flex: 1,
-        minWidth: 120,
-        valueGetter: ({ row }) => row.crop?.village || "N/A",
-      },
-      */
       {
         field: "cropsAvailable",
         headerName: "Crops Available",
@@ -261,6 +259,7 @@ const QC = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
         valueGetter: ({ row }) => row.crop?.paymentTerms || "N/A",
       },
+      /*
       {
         field: "name",
         headerName: "Buyer Name",
@@ -275,6 +274,7 @@ const QC = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
         valueGetter: ({ row }) => row.user?.mobileNumber || "N/A",
       },
+      */
       {
         field: "createdAt",
         headerName: "Request Date",
@@ -282,6 +282,30 @@ const QC = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
         valueFormatter: ({ value }) =>
           convertFromTimestampToDate(value.seconds, value.nanoseconds),
+      },
+      {
+        field: "tags",
+        headerName: "Tags",
+        flex: 1,
+        minWidth: 120,
+        renderCell: ({ value }) => {
+          if (Array.isArray(value) && value.length > 0) {
+            return (
+              <>
+                {value.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    label={tag}
+                    variant="outlined"
+                    color="warning"
+                  />
+                ))}
+              </>
+            );
+          }
+
+          return "N/A";
+        },
       },
       {
         field: "status",

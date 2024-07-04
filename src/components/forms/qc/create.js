@@ -20,6 +20,7 @@ import { doc, addDoc, updateDoc, collection } from "firebase/firestore";
 
 // Components
 import Loader from "@/components/loader";
+import DocPicker from "@/components/docPicker";
 import DatePicker from "@/components/datePicker";
 import FormHeader from "@/components/forms/components/formHeader";
 import FormFooter from "@/components/forms/components/formFooter";
@@ -29,7 +30,11 @@ import TextInput from "@/components/inputs/textInput";
 import SelectInput from "@/components/inputs/selectInput";
 
 // Utils
-import { getCurrentLocation, areCoordinates } from "@/utils";
+import {
+  getCurrentLocation,
+  areCoordinates,
+  uploadFilesHandler,
+} from "@/utils";
 
 // Constants
 import {
@@ -235,8 +240,14 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
     resolver: zodResolver(schema),
   });
 
-  const [loading, setLoading] = useState(false);
   const { cx, classes } = useStyles();
+
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleFileUpload = (files) => {
+    setFiles(files);
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -245,7 +256,6 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
       const {
         qcRequestId,
         qcDate,
-        readyToHarvest,
         lastHarvestDate,
         otherCropsAvailable,
         numberOfAcres,
@@ -336,7 +346,6 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
       const payload = {
         ...rest,
         qcDate: dayjs(qcDate).format("YYYY-MM-DD"),
-        readyToHarvest: dayjs(readyToHarvest).format("YYYY-MM-DD"),
         lastHarvestDate: dayjs(lastHarvestDate).format("YYYY-MM-DD"),
         location: {
           latitude: position.coords.latitude,
@@ -352,6 +361,16 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         polishedType,
         ipmOrOrganic,
       };
+
+      if (files && files.length > 0) {
+        const images = Array.from(files);
+
+        const urls = await uploadFilesHandler(images, "qc-images");
+
+        payload.images = urls;
+      } else {
+        payload.images = [];
+      }
 
       const reference = await addDoc(collection(db, "qcs"), payload);
 
@@ -420,6 +439,12 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         </Box>
 
         <FormHeader sx={{ mt: 4 }}>Farm Details</FormHeader>
+
+        <DocPicker
+          sx={{ mb: 2.5 }}
+          files={files}
+          handleFileUpload={handleFileUpload}
+        />
 
         <Box className={cx(classes.inputWrapper)}>
           <Controller

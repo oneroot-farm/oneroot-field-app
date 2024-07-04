@@ -173,7 +173,7 @@ const Crops = () => {
       </form>
 
       {/* Grid */}
-      <CropGrid data={crops} onSubmit={refetch} />
+      <CropGrid data={crops} refetch={refetch} />
 
       {/* Create Crop Modal */}
       <Modal

@@ -99,6 +99,12 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
       },
       {
+        field: "village",
+        headerName: "Village",
+        flex: 1,
+        minWidth: 120,
+      },
+      {
         field: "variety",
         headerName: "Variety",
         flex: 1,
@@ -172,14 +178,6 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         flex: 1,
         minWidth: 120,
       },
-      /*
-      {
-        field: "village",
-        headerName: "Village",
-        flex: 1,
-        minWidth: 120,
-      },
-      */
       {
         field: "cropsAvailable",
         headerName: "Crops Available",
@@ -220,6 +218,12 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
       },
       {
+        field: "notes",
+        headerName: "Notes",
+        flex: 1,
+        minWidth: 120,
+      },
+      {
         field: "tags",
         headerName: "Tags",
         flex: 1,
@@ -227,7 +231,7 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         renderCell: ({ value }) => {
           if (Array.isArray(value) && value.length > 0) {
             return (
-              <>
+              <Box className={classes.tags}>
                 {value.map((tag, index) => (
                   <Chip
                     key={index}
@@ -236,7 +240,7 @@ const Crop = ({ data, isLoading = false, refetch }) => {
                     color="warning"
                   />
                 ))}
-              </>
+              </Box>
             );
           }
 
@@ -299,6 +303,8 @@ const Crop = ({ data, isLoading = false, refetch }) => {
                 thirdLastHarvestDate: false,
                 cropsAvailable: false,
                 /* village: false, */
+                numberOfNuts: false,
+                nutsFromLastHarvest: false,
                 ageOfTree: false,
                 heightOfTree: false,
                 isTenderCoconutFarm: false,
@@ -357,6 +363,12 @@ const useStyles = makeStyles({ name: { Crop } })((theme) => ({
     "& .MuiCheckbox-root": {
       color: `${theme.palette.secondary.dark} !important`,
     },
+  },
+  tags: {
+    gap: 5,
+    padding: 5,
+    display: "flex",
+    overflowY: "auto",
   },
 }));
 
