@@ -374,7 +374,6 @@ const QC = ({ data, isLoading = false, refetch }) => {
                 numberOfTrees: false,
                 ageOfTree: false,
                 heightOfTree: false,
-                readyToHarvestDate: false,
               },
             },
 

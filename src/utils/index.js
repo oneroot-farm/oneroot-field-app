@@ -140,33 +140,36 @@ export const getTimeframeDates = (timeframe) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const endOfToday = new Date(today);
-  endOfToday.setHours(23, 59, 59, 999);
-
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  const endOfTomorrow = new Date(tomorrow);
-  endOfTomorrow.setHours(23, 59, 59, 999);
-
   const thisWeekStart = new Date(today);
-  const thisWeekEnd = new Date(today);
 
+  const thisWeekEnd = new Date(today);
   thisWeekEnd.setDate(today.getDate() + 6);
-  thisWeekEnd.setHours(23, 59, 59, 999);
+
+  const lastWeekStart = new Date(today);
+  lastWeekStart.setDate(today.getDate() - 7);
+
+  const lastWeekEnd = new Date(today);
+  lastWeekEnd.setDate(today.getDate() - 1);
 
   return {
     today: {
       startDate: Timestamp.fromDate(today),
-      endDate: Timestamp.fromDate(endOfToday),
+      endDate: Timestamp.fromDate(today),
     },
     tomorrow: {
       startDate: Timestamp.fromDate(tomorrow),
-      endDate: Timestamp.fromDate(endOfTomorrow),
+      endDate: Timestamp.fromDate(tomorrow),
     },
     thisWeek: {
       startDate: Timestamp.fromDate(thisWeekStart),
       endDate: Timestamp.fromDate(thisWeekEnd),
+    },
+    lastWeek: {
+      startDate: Timestamp.fromDate(lastWeekStart),
+      endDate: Timestamp.fromDate(lastWeekEnd),
     },
   }[timeframe];
 };

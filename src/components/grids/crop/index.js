@@ -222,6 +222,13 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         headerName: "Notes",
         flex: 1,
         minWidth: 120,
+        renderCell: ({ value }) => {
+          if (Array.isArray(value)) {
+            return value.join(", ");
+          }
+
+          return value || "N/A";
+        },
       },
       {
         field: "tags",

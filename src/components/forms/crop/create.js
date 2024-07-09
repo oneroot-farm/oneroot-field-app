@@ -227,8 +227,8 @@ const Create = ({ fields, refetch, handleModalClose }) => {
         turmericVariety = "",
         polishedType = "",
         ipmOrOrganic = "",
-        mapLink = "",
-        notes = "",
+        /* mapLink = "", */
+        /* notes = [], */
         location = { latitude: null, longitude: null },
         readyToHarvestDate = dayjs(),
         firstLastHarvestDate = dayjs(),
@@ -256,8 +256,8 @@ const Create = ({ fields, refetch, handleModalClose }) => {
         turmericVariety,
         polishedType,
         ipmOrOrganic,
-        mapLink,
-        notes,
+        /* mapLink, */
+        /* notes: Array.isArray(notes) ? notes.join(", ") : "", */
       };
 
       reset(formData);
@@ -376,7 +376,9 @@ const Create = ({ fields, refetch, handleModalClose }) => {
         position = await getCurrentLocation();
       }
 
-      const { mobileNumber, ...rest } = data;
+      const { notes, mobileNumber, ...rest } = data;
+
+      const timestamp = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
       const payload = {
         ...rest,
@@ -389,6 +391,9 @@ const Create = ({ fields, refetch, handleModalClose }) => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         },
+        notes: notes
+          ? notes.split(",").map((note) => `${timestamp} - ${note.trim()}`)
+          : [],
       };
 
       if (files && files.length > 0) {
@@ -928,7 +933,10 @@ const Create = ({ fields, refetch, handleModalClose }) => {
                 label="Notes"
                 variant="outlined"
                 error={!!errors.notes}
-                helperText={errors.notes?.message}
+                helperText={
+                  errors.notes?.message ||
+                  "Separate multiple values with commas (,)"
+                }
               />
             )}
           />

@@ -16,7 +16,7 @@ import Container from "@mui/material/Container";
 
 // Firebase
 import { db } from "@/firebase";
-import { doc, addDoc, updateDoc, collection } from "firebase/firestore";
+import { doc, getDoc, addDoc, updateDoc, collection } from "firebase/firestore";
 
 // Components
 import Loader from "@/components/loader";
@@ -195,6 +195,8 @@ const schema = z.object({
   /* .refine((value) => value !== "", "IPM Or Oraganic is required"), */
 
   coords: z.string().optional(),
+
+  notes: z.string().optional(),
 });
 
 const defaultValues = {
@@ -226,6 +228,7 @@ const defaultValues = {
   lastHarvestDate: dayjs().format("YYYY-MM-DD"),
   farmerUsesWhatsapp: "",
   coords: "",
+  notes: "",
 };
 
 const Create = ({ refetch, qcRequest, handleModalClose }) => {
@@ -254,7 +257,6 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
       setLoading(true);
 
       const {
-        qcRequestId,
         qcDate,
         lastHarvestDate,
         otherCropsAvailable,
@@ -263,7 +265,6 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         polishedType,
         ipmOrOrganic,
         coords,
-        ...rest
       } = data;
 
       if (otherCropsAvailable.includes("Turmeric")) {
@@ -343,6 +344,10 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         status: "completed",
       });
 
+      const { notes, coords: coordinates, ...rest } = data;
+
+      const timestamp = dayjs().format("YYYY-MM-DD HH:mm:ss");
+
       const payload = {
         ...rest,
         qcDate: dayjs(qcDate).format("YYYY-MM-DD"),
@@ -352,14 +357,9 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
           longitude: position.coords.longitude,
         },
         expirationDate: dayjs(qcDate).add(7, "day").format("YYYY-MM-DD"),
-        id: null,
         cropId: qcRequest.cropId,
         qcRequestId: qcRequest.id,
         cropsAvailable: otherCropsAvailable,
-        numberOfAcres,
-        turmericVariety,
-        polishedType,
-        ipmOrOrganic,
       };
 
       if (files && files.length > 0) {
@@ -377,6 +377,26 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
       const id = reference.id;
 
       await updateDoc(doc(db, "qcs", id), { id });
+
+      const cropRef = doc(db, "crops", qcRequest.cropId);
+
+      const crop = await getDoc(cropRef);
+
+      if (crop.exists()) {
+        const data = crop.data();
+
+        const existingNotes = data.notes || [];
+
+        const newNotes = notes
+          ? notes.split(",").map((note) => `${timestamp} - ${note.trim()}`)
+          : [];
+
+        await updateDoc(cropRef, {
+          notes: [...existingNotes, ...newNotes],
+        });
+      } else {
+        console.error("crop record not found");
+      }
 
       toast.success("Quality check created successfully!");
 
@@ -948,6 +968,26 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
                   <MenuItem value={l.value}>{l.label}</MenuItem>
                 ))}
               </SelectInput>
+            )}
+          />
+        </Box>
+
+        <Box className={cx(classes.inputWrapper)}>
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                fullWidth
+                label="Notes"
+                variant="outlined"
+                error={!!errors.notes}
+                helperText={
+                  errors.notes?.message ||
+                  "Separate multiple values with commas (,)"
+                }
+              />
             )}
           />
         </Box>
