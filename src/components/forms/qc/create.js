@@ -83,15 +83,11 @@ const schema = z.object({
     .refine((value) => value !== 0, "Number of trees cannot be zero")
     .refine((value) => !isNaN(value), "Number of trees must be a valid number"),
 
-  quality: z
-    .string()
-    .nullable()
-    .refine((val) => val !== "", "Quality is required"),
+  quality: z.string().nullable(),
+  /* .refine((val) => val !== "", "Quality is required"), */
 
-  size: z
-    .string()
-    .nullable()
-    .refine((val) => val !== "", "Size is required"),
+  size: z.string().nullable(),
+  /* .refine((val) => val !== "", "Size is required"), */
 
   hardShellNutsPercentage: z
     .number()
@@ -120,7 +116,7 @@ const schema = z.object({
   waterPercentage: z
     .number()
     .nonnegative("Please enter a valid water percentage")
-    .refine((value) => value !== 0, "Water percentage cannot be zero")
+    /* .refine((value) => value !== 0, "Water percentage cannot be zero") */
     .refine(
       (value) => !isNaN(value),
       "Water percentage must be a valid number"
@@ -129,16 +125,14 @@ const schema = z.object({
   malaiPercentage: z
     .number()
     .nonnegative("Please enter a valid malai percentage")
-    .refine((value) => value !== 0, "Malai percentage cannot be zero")
+    /* .refine((value) => value !== 0, "Malai percentage cannot be zero") */
     .refine(
       (value) => !isNaN(value),
       "Malai percentage must be a valid number"
     ),
 
-  shape: z
-    .string()
-    .nullable()
-    .refine((val) => val !== "", "Shape is required"),
+  shape: z.string().nullable(),
+  /* .refine((val) => val !== "", "Shape is required"), */
 
   generalHarvestCycleInDays: z
     .number()
@@ -516,7 +510,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
               <SelectInput
                 {...field}
                 fullWidth
-                label="Quality*"
+                label="Quality"
                 variant="outlined"
                 error={!!errors.quality}
                 message={errors.quality?.message}
@@ -535,7 +529,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
               <SelectInput
                 {...field}
                 fullWidth
-                label="Size*"
+                label="Size"
                 variant="outlined"
                 error={!!errors.size}
                 message={errors.size?.message}
@@ -613,7 +607,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
                 {...rest}
                 fullWidth
                 type="number"
-                label="Hard Shell Nuts Percentage*"
+                label="Hard Shell Nuts Percentage"
                 variant="outlined"
                 inputProps={{
                   step: 0.1,
@@ -674,7 +668,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
               <SelectInput
                 {...field}
                 fullWidth
-                label="Mite Attacks or Marks*"
+                label="Mite Attacks or Marks"
                 variant="outlined"
                 error={!!errors.miteAttacksOrMarks}
                 message={errors.miteAttacksOrMarks?.message}
@@ -694,7 +688,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
                 {...rest}
                 fullWidth
                 type="number"
-                label="Water Percentage*"
+                label="Water Percentage"
                 variant="outlined"
                 inputProps={{
                   step: 0.1,
@@ -716,7 +710,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
                 {...rest}
                 fullWidth
                 type="number"
-                label="Malai Percentage*"
+                label="Malai Percentage"
                 variant="outlined"
                 inputProps={{
                   step: 0.1,
@@ -735,7 +729,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
               <SelectInput
                 {...field}
                 fullWidth
-                label="Shape*"
+                label="Shape"
                 variant="outlined"
                 error={!!errors.shape}
                 message={errors.shape?.message}

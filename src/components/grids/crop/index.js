@@ -218,19 +218,6 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         minWidth: 120,
       },
       {
-        field: "notes",
-        headerName: "Notes",
-        flex: 1,
-        minWidth: 120,
-        renderCell: ({ value }) => {
-          if (Array.isArray(value)) {
-            return value.join(", ");
-          }
-
-          return value || "N/A";
-        },
-      },
-      {
         field: "tags",
         headerName: "Tags",
         flex: 1,

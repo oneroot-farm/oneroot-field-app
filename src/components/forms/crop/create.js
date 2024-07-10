@@ -376,7 +376,7 @@ const Create = ({ fields, refetch, handleModalClose }) => {
         position = await getCurrentLocation();
       }
 
-      const { notes, mobileNumber, ...rest } = data;
+      const { notes, mobileNumber, coords: coordinates, ...rest } = data;
 
       const timestamp = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
