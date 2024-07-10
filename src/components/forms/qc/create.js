@@ -60,7 +60,7 @@ const schema = z.object({
 
   qcDate: z.string().min(1, "QC Date is required"),
 
-  readyToHarvest: z.string().min(1, "Ready to Harvest date is required"),
+  readyToHarvestDate: z.string().min(1, "Ready to Harvest date is required"),
 
   heightOfTree: z
     .number()
@@ -202,7 +202,7 @@ const schema = z.object({
 const defaultValues = {
   qcInspector: "",
   qcDate: dayjs().format("YYYY-MM-DD"),
-  readyToHarvest: dayjs().format("YYYY-MM-DD"),
+  readyToHarvestDate: dayjs().format("YYYY-MM-DD"),
   heightOfTree: 0,
   estimatedNumberOfNuts: 0,
   numberOfTrees: 0,
@@ -259,6 +259,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
       const {
         qcDate,
         lastHarvestDate,
+        readyToHarvestDate,
         otherCropsAvailable,
         numberOfAcres,
         turmericVariety,
@@ -350,16 +351,17 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
 
       const payload = {
         ...rest,
+        cropId: qcRequest.cropId,
+        qcRequestId: qcRequest.id,
+        cropsAvailable: otherCropsAvailable,
         qcDate: dayjs(qcDate).format("YYYY-MM-DD"),
         lastHarvestDate: dayjs(lastHarvestDate).format("YYYY-MM-DD"),
+        readyToHarvestDate: dayjs(readyToHarvestDate).format("YYYY-MM-DD"),
         location: {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         },
         expirationDate: dayjs(qcDate).add(7, "day").format("YYYY-MM-DD"),
-        cropId: qcRequest.cropId,
-        qcRequestId: qcRequest.id,
-        cropsAvailable: otherCropsAvailable,
       };
 
       if (files && files.length > 0) {
@@ -787,6 +789,24 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
 
         <Box className={cx(classes.inputWrapper)}>
           <Controller
+            name="readyToHarvestDate"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                pickerProps={{
+                  format: "YYYY-MM-DD",
+                  label: "Ready To Harvest Date*",
+                  sx: { width: "100%" },
+                  value: dayjs(field.value),
+                  onChange: (date) =>
+                    field.onChange(dayjs(date).format("YYYY-MM-DD")),
+                  renderInput: (params) => <TextInput {...params} />,
+                }}
+              />
+            )}
+          />
+
+          <Controller
             name="lastHarvestDate"
             control={control}
             render={({ field }) => (
@@ -803,7 +823,9 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
               />
             )}
           />
+        </Box>
 
+        <Box className={cx(classes.inputWrapper)}>
           <Controller
             name="lastHarvestNumberOfNuts"
             control={control}
@@ -820,9 +842,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
               />
             )}
           />
-        </Box>
 
-        <Box className={cx(classes.inputWrapper)}>
           <Controller
             name="otherCropsAvailable"
             control={control}
