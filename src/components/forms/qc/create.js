@@ -225,7 +225,7 @@ const defaultValues = {
   notes: "",
 };
 
-const Create = ({ refetch, qcRequest, handleModalClose }) => {
+const Create = ({ refetch, fields, handleModalClose }) => {
   const {
     watch,
     control,
@@ -318,22 +318,7 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         }
       }
 
-      let position = null;
-
-      if (coords && areCoordinates(coords)) {
-        const [lat, lng] = coords.split(",");
-
-        position = {
-          coords: {
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lng),
-          },
-        };
-      } else {
-        position = await getCurrentLocation();
-      }
-
-      const qcRequestRef = doc(db, "qc_requests", qcRequest.id);
+      const qcRequestRef = doc(db, "qc_requests", fields.id);
 
       await updateDoc(qcRequestRef, {
         status: "completed",
@@ -345,18 +330,36 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
 
       const payload = {
         ...rest,
-        cropId: qcRequest.cropId,
-        qcRequestId: qcRequest.id,
+        cropId: fields.cropId,
+        qcRequestId: fields.id,
         cropsAvailable: otherCropsAvailable,
         qcDate: dayjs(qcDate).format("YYYY-MM-DD"),
         lastHarvestDate: dayjs(lastHarvestDate).format("YYYY-MM-DD"),
         readyToHarvestDate: dayjs(readyToHarvestDate).format("YYYY-MM-DD"),
-        location: {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        },
         expirationDate: dayjs(qcDate).add(7, "day").format("YYYY-MM-DD"),
       };
+
+      let tags = fields?.tags ? [...fields.tags] : [];
+
+      if (coords && areCoordinates(coords)) {
+        const [lat, lng] = coords.split(",");
+
+        payload.location = {
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lng),
+        };
+
+        if (fields && fields?.tags) {
+          tags = tags.filter((t) => t !== "need-location");
+        }
+      } else {
+        const position = await getCurrentLocation();
+
+        payload.location = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+      }
 
       if (files && files.length > 0) {
         const images = Array.from(files);
@@ -368,13 +371,15 @@ const Create = ({ refetch, qcRequest, handleModalClose }) => {
         payload.images = [];
       }
 
+      payload.tags = tags;
+
       const reference = await addDoc(collection(db, "qcs"), payload);
 
       const id = reference.id;
 
       await updateDoc(doc(db, "qcs", id), { id });
 
-      const cropRef = doc(db, "crops", qcRequest.cropId);
+      const cropRef = doc(db, "crops", fields.cropId);
 
       const crop = await getDoc(cropRef);
 

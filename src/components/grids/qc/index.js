@@ -391,7 +391,7 @@ const QC = ({ data, isLoading = false, refetch }) => {
       >
         <CreateQCForm
           refetch={refetch}
-          qcRequest={qcRequest}
+          fields={qcRequest}
           handleModalClose={() => closeModal("create")}
         />
       </Modal>
