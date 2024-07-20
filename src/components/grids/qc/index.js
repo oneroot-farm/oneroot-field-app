@@ -287,20 +287,21 @@ const QC = ({ data, isLoading = false, refetch }) => {
         field: "tags",
         headerName: "Tags",
         flex: 1,
-        minWidth: 120,
+        minWidth: 180,
         renderCell: ({ value }) => {
           if (Array.isArray(value) && value.length > 0) {
             return (
-              <>
+              <Box className={classes.tags}>
                 {value.map((tag, index) => (
                   <Chip
                     key={index}
                     label={tag}
+                    size="small"
                     variant="outlined"
                     color="warning"
                   />
                 ))}
-              </>
+              </Box>
             );
           }
 
@@ -376,7 +377,6 @@ const QC = ({ data, isLoading = false, refetch }) => {
                 heightOfTree: false,
               },
             },
-
             pagination: { paginationModel: { pageSize: 30 } },
           }}
         />
@@ -425,6 +425,13 @@ const useStyles = makeStyles({ name: { QC } })((theme) => ({
     "& .MuiCheckbox-root": {
       color: `${theme.palette.secondary.dark} !important`,
     },
+  },
+
+  tags: {
+    gap: 5,
+    padding: 5,
+    display: "flex",
+    overflowY: "auto",
   },
 }));
 

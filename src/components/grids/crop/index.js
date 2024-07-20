@@ -221,7 +221,7 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         field: "tags",
         headerName: "Tags",
         flex: 1,
-        minWidth: 120,
+        minWidth: 180,
         renderCell: ({ value }) => {
           if (Array.isArray(value) && value.length > 0) {
             return (
@@ -230,6 +230,7 @@ const Crop = ({ data, isLoading = false, refetch }) => {
                   <Chip
                     key={index}
                     label={tag}
+                    size="small"
                     variant="outlined"
                     color="warning"
                   />
@@ -358,6 +359,7 @@ const useStyles = makeStyles({ name: { Crop } })((theme) => ({
       color: `${theme.palette.secondary.dark} !important`,
     },
   },
+
   tags: {
     gap: 5,
     padding: 5,
