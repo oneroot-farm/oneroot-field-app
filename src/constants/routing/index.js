@@ -2,6 +2,7 @@
 
 // Icons
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import AgricultureIcon from "@mui/icons-material/Agriculture";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
@@ -13,6 +14,10 @@ export const TOP_MENU = [
   {
     name: "Dashboard",
     icon: <SpaceDashboardIcon />,
+  },
+  {
+    name: "Farms",
+    icon: <AgricultureIcon />,
   },
   /*
   {

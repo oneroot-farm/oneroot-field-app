@@ -257,6 +257,7 @@ const Crop = ({ data, isLoading = false, refetch }) => {
               onClick={() =>
                 openGoogleMapUrl(row.location.latitude, row.location.longitude)
               }
+              disabled={!row.location ? true : false}
             >
               <LocationOnIcon />
             </IconButton>
