@@ -22,7 +22,7 @@ import NoRows from "@/components/noRows";
 import UpdateCropForm from "@/components/forms/crop/update";
 
 // Utils
-import { openGoogleMapUrl } from "@/utils";
+import { openGoogleMapUrl, convertFromTimestampToDate } from "@/utils";
 
 // Icons
 import EditIcon from "@mui/icons-material/Edit";
@@ -216,6 +216,14 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         headerName: "Payment Terms",
         flex: 1,
         minWidth: 120,
+      },
+      {
+        field: "createdAt",
+        headerName: "Created At",
+        flex: 1,
+        minWidth: 120,
+        valueFormatter: ({ value }) =>
+          convertFromTimestampToDate(value.seconds, value.nanoseconds),
       },
       {
         field: "tags",
