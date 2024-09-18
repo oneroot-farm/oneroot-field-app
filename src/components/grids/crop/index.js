@@ -223,7 +223,9 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         flex: 1,
         minWidth: 120,
         valueFormatter: ({ value }) =>
-          convertFromTimestampToDate(value.seconds, value.nanoseconds),
+          value && value.seconds && value.nanoseconds
+            ? convertFromTimestampToDate(value.seconds, value.nanoseconds)
+            : "N/A",
       },
       {
         field: "tags",
