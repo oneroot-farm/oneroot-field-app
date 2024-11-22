@@ -20,6 +20,7 @@ import NoRows from "@/components/noRows";
 
 // Forms
 import UpdateCropForm from "@/components/forms/crop/update";
+import UpdateFarmForm from "@/components/forms/farm/update";
 
 // Utils
 import { openGoogleMapUrl, convertFromTimestampToDate } from "@/utils";
@@ -326,7 +327,7 @@ const Crop = ({ data, isLoading = false, refetch }) => {
         />
       </Box>
 
-      {/* Update Crop Modal */}
+      {/* Update Farm Modal */}
       <Modal
         open={modal.update}
         header={"Update Farm Form"}
@@ -338,6 +339,12 @@ const Crop = ({ data, isLoading = false, refetch }) => {
           refetch={refetch}
           handleModalClose={() => closeModal("update")}
         />
+
+        {/* <UpdateFarmForm
+          fields={crop}
+          refetch={refetch}
+          handleModalClose={() => closeModal("update")}
+        /> */}
       </Modal>
     </>
   );
